@@ -4,13 +4,13 @@ using System.Collections;
 public class GunController : MonoBehaviour {
 
     public Transform weaponHold;
-    public Gun startingGun;
+    public Gun[] allGuns;
     Gun equippedGun;
 
     void Start() {
-        if (startingGun != null) {
-            EquipGun(startingGun);
-        }
+        // if (startingGun != null) {
+        //     EquipGun(startingGun);
+        // }
     }
 
     public void EquipGun(Gun gunToEquip) {
@@ -19,6 +19,12 @@ public class GunController : MonoBehaviour {
         }
         equippedGun = Instantiate (gunToEquip, weaponHold.position,weaponHold.rotation) as Gun;
         equippedGun.transform.parent = weaponHold;
+    }
+    
+    public void EquipGun(int gunIndex) {
+        if (gunIndex < allGuns.Length) {
+            EquipGun(allGuns[gunIndex]);
+        }
     }
 
     public void Shoot(float damage) {
@@ -41,5 +47,19 @@ public class GunController : MonoBehaviour {
     public float GunHeight {
 
         get { return weaponHold.position.y; }
+    }
+    
+    public void Aim(Vector3 aimPoint)
+    {
+        if(equippedGun != null) {
+            equippedGun.Aim(aimPoint);
+        }
+    }
+    
+    public void Reload()
+    {
+        if(equippedGun != null) {
+            equippedGun.Reload();
+        }
     }
 }

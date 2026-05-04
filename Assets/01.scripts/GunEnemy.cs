@@ -49,7 +49,7 @@ public class GunEnemy : EnemyBase
             yield return null;
             
         }
-        
+        if (target == null) yield break;
         Vector3 dir = (target.position - transform.position).normalized;
         transform.rotation = Quaternion.LookRotation(dir);
 
@@ -83,7 +83,7 @@ public class GunEnemy : EnemyBase
         }
         startingHealth = enemyHealth;
 
-        skinMaterial = GetComponent<Renderer> ().material;
+        skinMaterial = GetComponent<Renderer> ().sharedMaterial;
         skinMaterial.color = skinColour;
         originalColor = skinMaterial.color;
         

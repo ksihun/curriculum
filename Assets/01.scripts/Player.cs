@@ -18,16 +18,25 @@ public class Player : LivingEntity , IHealable
     private void Awake()
     {
         r = GetComponent<Renderer>();
+        _controller = GetComponent<PlayerController>();
+        viewCamera = Camera.main;
+        gunController = GetComponent<GunController>();
+        FindObjectOfType<Spawner>().OnNewWave += OnNewWave;
     }
 
     protected override void Start()
     {
         base.Start();
-        _controller = GetComponent<PlayerController>();
-        viewCamera = Camera.main;
-        gunController = GetComponent<GunController>();
+
+        
 
 
+    }
+    
+    void OnNewWave(int waveNumber)
+    {
+        health = startingHealth;
+        gunController.EquipGun(waveNumber-1);
     }
 
     public override void TakeDamage(float damage)
@@ -78,6 +87,9 @@ public class Player : LivingEntity , IHealable
             _controller.LookAt(point);
             crosshairs.transform.position = point;
             crosshairs.DetectTargets(ray);
+            if ((new Vector2(point.x,point.z)  - 
+                 new Vector2(transform.position.x,transform.position.z)).sqrMagnitude> 1f)
+            gunController.Aim(point);
         }
 
 
@@ -90,12 +102,26 @@ public class Player : LivingEntity , IHealable
         {
             gunController.OnTriggerRelease();
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            gunController.Reload();
+        }
+        
+        if (transform.position.y < -20) TakeDamage(health);
     }
     
     public void Heal(float heal)
     {
         health = Mathf.Min(health + heal, startingHealth);
         Debug.Log(health);
+        
+    }
+    
+    protected override void Die()
+    {
+        base.Die();
+        AudioManager.instance.PlaySound("Player Death", Vector3.zero);
         
     }
     

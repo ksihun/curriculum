@@ -17,6 +17,7 @@ public class MeleeEnemy : EnemyBase
     protected override bool IsInAttackRange()
     {
 
+        
         float range = Mathf.Pow(attackDistanceThreshold + myCollisionRadius + targetCollisionRadius, 2);
         float sqrDstToTarget = (target.position - transform.position).sqrMagnitude;
 
@@ -33,6 +34,7 @@ public class MeleeEnemy : EnemyBase
         }
         startingHealth = enemyHealth;
 
+        deathEffect.startColor = new Color(skinColour.r, skinColour.g, skinColour.b, 1f);
         skinMaterial = GetComponent<Renderer> ().material;
         skinMaterial.color = skinColour;
         originalColor = skinMaterial.color;

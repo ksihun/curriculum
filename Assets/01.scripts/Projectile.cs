@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Windows.Speech;
 
-public class Projectile : MonoBehaviour
+public class Projectile : PoolObject<Projectile>
 
 {
+    [SerializeField] float defaultDamage = 1;
     public LayerMask CollisionMask;
     float speed = 10; 
     float damage = 1;
@@ -13,23 +13,63 @@ public class Projectile : MonoBehaviour
     float skinWidth = 0.1f; //충돌 여유 공간
     
     public Color trailCoulor;
-     
-    void Start()
+    private TrailRenderer trail;
+
+    private void Awake()
     {
-        Destroy(gameObject, lifetime);
-        
-        Collider[] initialCollisions = Physics.OverlapSphere(transform.position, 0.1f, CollisionMask);
-        //생성 되는 순간 위치에 겹쳐있는 배열들 받아오기
-        if (initialCollisions.Length > 0) //겹쳐있는게 하나라도 있으면
+        trail = GetComponent<TrailRenderer>();
+        if (trail != null)
         {
-            OnHitObject(initialCollisions[0],transform.position);//첫 겹쳐있는 콜라이더에게 데미지
-            
+            trail.emitting = false;
+            trail.Clear();
         }
         
-        GetComponent<TrailRenderer>().material.SetColor("_TintColor", trailCoulor);
         
-        
-        
+    }
+    public override void OnSpawned() //초기화
+    {
+        base.OnSpawned();
+
+        StopAllCoroutines();
+        StartCoroutine(LifeTimer());
+
+        // 기본값으로 리셋
+        damage = defaultDamage;
+
+        // 트레일 초기화
+        if (trail != null)
+        {
+            trail.emitting = false;
+            trail.Clear();
+            trail.transform.position = transform.position;
+            trail.emitting = true;
+        }
+
+        // 생성 직후 겹침 체크
+        Collider[] initialCollisions = Physics.OverlapSphere(transform.position, 0.1f, CollisionMask);
+        if (initialCollisions.Length > 0)
+        {
+            OnHitObject(initialCollisions[0], transform.position);
+        }
+    }
+
+    public override void OnDespawned() //디스폰
+    {
+        base.OnDespawned();
+        StopAllCoroutines();
+        if (trail != null)
+        {
+            trail.Clear();
+            trail.emitting = false;
+        }
+    }
+    
+    private IEnumerator LifeTimer() 
+    {
+        yield return new WaitForSeconds(lifetime);
+
+        OnDespawned();
+        ReturnToPool(this);
     }
 
     public void SetSpeed(float newspeed)
@@ -69,7 +109,10 @@ public class Projectile : MonoBehaviour
         {
             damageableObject.TakeHit(damage,hitPoint , transform.forward);
         }
-        GameObject.Destroy(gameObject);
+        //GameObject.Destroy(gameObject);
+        
+        OnDespawned(); //충돌 시 디스폰
+        ReturnToPool(this); //반납
         
     }
 

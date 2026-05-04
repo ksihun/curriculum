@@ -197,4 +197,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponHold: {fileID: 4784739913737163030}
-  startingGun: {fileID: -5394622460140906220, guid: 615712c9bf5684ec78b26eaab92afacc, type: 3}
+  allGuns:
+  - {fileID: 1743542140193699507, guid: 8f6efe1178a1f41d9a97ed6c058c5e22, type: 3}
+  - {fileID: 1743542140193699507, guid: 8f6efe1178a1f41d9a97ed6c058c5e22, type: 3}
+  - {fileID: 1743542140193699507, guid: 8f6efe1178a1f41d9a97ed6c058c5e22, type: 3}
+  - {fileID: 1743542140193699507, guid: 8f6efe1178a1f41d9a97ed6c058c5e22, type: 3}
+  - {fileID: 1743542140193699507, guid: 8f6efe1178a1f41d9a97ed6c058c5e22, type: 3}

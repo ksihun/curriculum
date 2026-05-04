@@ -14,6 +14,7 @@ public abstract class EnemyBase : LivingEntity
     [SerializeField] private GameObject healPackPrefab;
     
     public ParticleSystem  deathEffect;
+    public static event System.Action OnDeathStatic;
     
     
     protected NavMeshAgent pathfinder;
@@ -36,8 +37,17 @@ public abstract class EnemyBase : LivingEntity
     
     public override void TakeHit(float damage, Vector3 hitPoint, Vector3 hitDirection)
     {
+        AudioManager.instance.PlaySound("Impact", transform.position);
         if (damage >= health)
-            Destroy(Instantiate(deathEffect.gameObject, hitPoint, Quaternion.FromToRotation(Vector3.forward, hitDirection))as GameObject, deathEffect.startLifetime);
+        {
+            if (OnDeathStatic != null) OnDeathStatic();
+            AudioManager.instance.PlaySound("Enemy Death", transform.position);
+            Destroy(
+                Instantiate(deathEffect.gameObject, hitPoint,
+                    Quaternion.FromToRotation(Vector3.forward, hitDirection)) as GameObject, deathEffect.startLifetime);
+            
+        }
+
         base.TakeHit(damage, hitPoint, hitDirection);
     }
     
@@ -76,7 +86,9 @@ public abstract class EnemyBase : LivingEntity
 
     protected virtual void Awake()
     {
-        skinMaterial = GetComponent<Renderer>().material;
+        //여기 바꾸니까 되긴함
+        //skinMaterial = GetComponent<Renderer>().material;
+        skinMaterial = GetComponent<Renderer>().sharedMaterial;
         originalColor = skinMaterial.color;
         pathfinder = GetComponent<NavMeshAgent>();
 
@@ -151,6 +163,7 @@ public abstract class EnemyBase : LivingEntity
         if (!IsInAttackRange()) return;
         
         nextAttackTime = Time.time + AttackCooldown;
+        AudioManager.instance.PlaySound("Enemy Attack", transform.position);
         StartCoroutine(Attack());
         
     }

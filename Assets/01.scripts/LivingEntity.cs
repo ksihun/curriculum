@@ -5,7 +5,7 @@ using UnityEngine;
 public class LivingEntity : MonoBehaviour, IDamageable
 {
     public float startingHealth = 5;
-    protected float health;
+    public float health { get; protected set; }
     protected bool dead;
     public event System.Action OnDeath;
     public event System.Func<int> OnHealthChanged;
@@ -32,7 +32,8 @@ public class LivingEntity : MonoBehaviour, IDamageable
     public virtual void TakeDamage(float damage)
     {
         health -= damage;
-        DamageSpawner.Instance.ShowDamage(damage, this.transform.position);
+        //DamageSpawner.Instance.ShowDamage(damage, this.transform.position);
+        GlobalEventManager.CallDamagePushed(this,transform.position,damage);
         if (health <= 0)
         {
             Die();
